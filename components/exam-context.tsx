@@ -1,5 +1,6 @@
 "use client";
 
+import { error } from "console";
 import {
   createContext,
   useContext,
@@ -337,25 +338,32 @@ export function ExamProvider({ children }: { children: ReactNode }) {
   // Start the exam with the selected category
   const startExam = useCallback(() => {
     if (selectedCategory) {
-      let questions: Question[] = [];
+      let questions;
 
-      if (selectedCategory === "All Categories") {
+      if (selectedCategory.name === "All Categories") {
         // For "All Categories", take a subset of questions from each category
-        const questionsPerCategory = 2; // Take 2 questions from each category for a balanced test
-        Object.values(questionsByCategory).forEach((categoryQuestions) => {
-          // Get random questions from each category
-          const randomQuestions = [...categoryQuestions]
-            .sort(() => 0.5 - Math.random())
-            .slice(0, questionsPerCategory);
-          questions = [...questions, ...randomQuestions];
-        });
+        // const questionsPerCategory = 2; // Take 2 questions from each category for a balanced test
+        // Object.values(questionsByCategory).forEach((categoryQuestions) => {
+        //   // Get random questions from each category
+        //   const randomQuestions = [...categoryQuestions]
+        //     .sort(() => 0.5 - Math.random())
+        //     .slice(0, questionsPerCategory);
+        //   questions = [...questions, ...randomQuestions];
+        // });
+        fetch("/api/questions")
+          .then((res) => res.json())
+          .then((data) => (questions = data))
+          .catch((error) => console.log("Error: ", error));
       } else {
         // For specific categories, use all questions from that category
-        questions = questionsByCategory[selectedCategory];
+        fetch(`/api/questions/?categoryId=${selectedCategory.id}`)
+          .then((res) => res.json())
+          .then((data) => setCurrentQuestions(data))
+          .catch((error) => console.log("Error: ", error));
       }
-
-      setCurrentQuestions(questions);
-      setUserAnswers(new Array(questions.length).fill(null));
+      console.log("from callback", questions);
+      // setCurrentQuestions(questions);
+      // setUserAnswers(new Array(questions.length).fill(null));
       setCurrentQuestionIndex(0);
       setExamStarted(true);
       setExamSubmitted(false);

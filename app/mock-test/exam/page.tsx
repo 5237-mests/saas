@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { useExam } from "@/components/exam-context"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useExam } from "@/components/exam-context";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 export default function ExamPage() {
-  const router = useRouter()
+  const router = useRouter();
   const {
     selectedCategory,
     currentQuestions,
@@ -19,40 +25,41 @@ export default function ExamPage() {
     userAnswers,
     setUserAnswer,
     examStarted,
-  } = useExam()
+  } = useExam();
 
   useEffect(() => {
     // Redirect if exam hasn't started or no category selected
-    if (!examStarted || !selectedCategory) {
-      router.push("/mock-test")
+    if (!examStarted || !selectedCategory?.name) {
+      router.push("/mock-test");
     }
-  }, [examStarted, selectedCategory, router])
-
-  const currentQuestion = currentQuestions[currentQuestionIndex]
-  const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100
+  }, [examStarted, selectedCategory, router]);
+  console.log("currentQ", currentQuestions);
+  const currentQuestion = currentQuestions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
 
   const handleNext = () => {
     if (currentQuestionIndex < currentQuestions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1)
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1)
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
-  }
+  };
 
   const handleSubmit = () => {
-    router.push("/mock-test/submit")
-  }
+    router.push("/mock-test/submit");
+  };
 
   const handleAnswerSelect = (value: string) => {
-    setUserAnswer(currentQuestionIndex, Number.parseInt(value))
-  }
+    setUserAnswer(currentQuestionIndex, Number.parseInt(value));
+  };
 
   if (!currentQuestion) {
-    return null
+    console.log("currentQuestion-Z", currentQuestion);
+    return <div>no questions av</div>;
   }
 
   return (
@@ -60,7 +67,9 @@ export default function ExamPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-muted-foreground">{selectedCategory} Test</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              {selectedCategory} Test
+            </span>
             <span className="text-sm font-medium">
               Question {currentQuestionIndex + 1} of {currentQuestions.length}
             </span>
@@ -75,9 +84,18 @@ export default function ExamPage() {
             className="space-y-3"
           >
             {currentQuestion.options.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2 border p-3 rounded-md hover:bg-muted">
-                <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                <Label htmlFor={`option-${index}`} className="flex-grow cursor-pointer">
+              <div
+                key={index}
+                className="flex items-center space-x-2 border p-3 rounded-md hover:bg-muted"
+              >
+                <RadioGroupItem
+                  value={index.toString()}
+                  id={`option-${index}`}
+                />
+                <Label
+                  htmlFor={`option-${index}`}
+                  className="flex-grow cursor-pointer"
+                >
                   {option}
                 </Label>
               </div>
@@ -86,10 +104,17 @@ export default function ExamPage() {
         </CardContent>
         <CardFooter className="flex justify-between">
           <div className="flex gap-3">
-            <Button onClick={handlePrevious} variant="outline" disabled={currentQuestionIndex === 0}>
+            <Button
+              onClick={handlePrevious}
+              variant="outline"
+              disabled={currentQuestionIndex === 0}
+            >
               Previous
             </Button>
-            <Button onClick={handleNext} disabled={currentQuestionIndex === currentQuestions.length - 1}>
+            <Button
+              onClick={handleNext}
+              disabled={currentQuestionIndex === currentQuestions.length - 1}
+            >
               Next
             </Button>
           </div>
@@ -98,7 +123,7 @@ export default function ExamPage() {
           </Button>
         </CardFooter>
       </Card>
+      jggj kisdl;j dgf
     </div>
-  )
+  );
 }
-

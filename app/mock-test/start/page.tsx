@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useExam } from "@/components/exam-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,28 @@ export default function StartTest() {
     }
   }, [selectedCategory, router]);
 
+  // fetch the all question and or question by category
+  const [questions, setQuestions] = useState(0);
+
+  useEffect(() => {
+    // fetch questions
+    const questionres = () => {
+      if (selectedCategory.name == "All Categories") {
+        fetch("/api/questions")
+          .then((res) => res.json())
+          .then((data) => setQuestions(data.length))
+          .catch((err) => console.log("first", err));
+      } else {
+        fetch(`/api/questions?categoryId=${selectedCategory.id}`)
+          .then((res) => res.json())
+          .then((data) => setQuestions(data.length))
+          .catch((er) => console.log("first3", er));
+      }
+    };
+
+    questionres();
+  }, []);
+
   const handleBeginExam = () => {
     startExam();
     router.push("/mock-test/exam");
@@ -47,18 +69,21 @@ export default function StartTest() {
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <div className="flex items-center gap-2">
               <FileQuestion className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">
-                {selectedCategory === "All Categories"
-                  ? "10 Questions (Mixed)" // Assuming 2 questions per category × 5 categories = 10 questions
+              {/* <span className="text-sm font-medium">
+                {selectedCategory.name === "All Categories"
+                  ? "10  (Mixed)" // Assuming 2 questions per category × 5 categories = 10 questions
                   : selectedCategory
                   ? questionsByCategory[selectedCategory]?.length || 0
                   : 0}{" "}
                 Questions
-              </span>
+              </span> */}
+              <span className="text-sm font-medium">{questions} Questions</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">No Time Limit</span>
+              <span className="text-sm font-medium">
+                {questions} Minutes Time Limit
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-primary" />
@@ -69,6 +94,8 @@ export default function StartTest() {
           <div className="bg-muted p-4 rounded-md">
             <h3 className="font-medium mb-2">Exam Rules</h3>
             <ul className="text-sm text-muted-foreground space-y-2">
+              <li>• You have 1 minute per question to complete the test.</li>
+              <li>• The test will automatically submit when time runs out.</li>
               <li>
                 • You can navigate between questions using the Next and Previous
                 buttons.
@@ -94,7 +121,11 @@ export default function StartTest() {
                 • If you're unsure about an answer, you can come back to it
                 later.
               </li>
-              <li>• Review all your answers before submitting the test.</li>
+              <li>
+                • Manage your time wisely - don't spend too long on any single
+                question.
+              </li>
+              <li>• You can pause the timer if you need a short break.</li>
             </ul>
           </div>
         </CardContent>
