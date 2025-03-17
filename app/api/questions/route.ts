@@ -143,6 +143,7 @@
 // }
 
 import prisma from "@/lib/prisma";
+import { encrypt, decrypt } from "@/utils/encryptionUtils";
 import { NextResponse } from "next/server";
 
 // GET endpoint to fetch questions
@@ -158,14 +159,16 @@ export async function GET(req: Request) {
           where: { categoryId },
           include: { category: true }, // Include the related category
         })
-      : await prisma.question.findMany({
-          include: { category: true }, // Include the related category
-        });
+      : await prisma.question.findMany();
 
     // Return the questions as JSON
+    // Decrypt the options
+    questions.forEach((question) => {
+      question.text = decrypt(question.text);
+      question.options = question?.options?.map((option) => decrypt(option));
+    });
     return NextResponse.json(questions);
   } catch (error) {
-    console.error("Error fetching questions:", error);
     return NextResponse.json(
       { error: "Error fetching questions" },
       { status: 500 }
@@ -187,25 +190,24 @@ export async function POST(req: Request) {
       );
     }
 
+    // Encrypt the options
+    const encryptedOptions = options.map((option) => encrypt(option));
+    const encryptedText = encrypt(text);
     // Create a new question in the database
     const question = await prisma.question.create({
       data: {
-        text,
-        options,
+        text: encryptedText,
+        options: encryptedOptions,
         correctAnswer,
         categoryId,
       },
-      include: { category: true }, // Include the related category in the response
     });
 
     // Return the created question as JSON
     return NextResponse.json(question, { status: 201 });
   } catch (error) {
-    console.error("Error creating question:", error);
-    return NextResponse.json(
-      { error: "Error creating question" },
-      { status: 500 }
-    );
+    // console.error("Error creating question:", error);
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }
 

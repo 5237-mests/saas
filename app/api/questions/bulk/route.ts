@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { encrypt } from "@/utils/encryptionUtils";
 import { Readable } from "stream";
 import Papa from "papaparse";
 
@@ -66,13 +67,17 @@ export async function POST(req: Request) {
 
       // Transform the row into the Question model structure
       return {
-        text: row.question,
-        options: [row.option_a, row.option_b, row.option_c, row.option_d],
+        text: encrypt(row.question),
+        options: [
+          encrypt(row.option_a),
+          encrypt(row.option_b),
+          encrypt(row.option_c),
+          encrypt(row.option_d),
+        ],
         correctAnswer,
         categoryId, // Use the categoryId from the request body
       };
     });
-
     // Insert the questions into the database
     await prisma.question.createMany({
       data: questions,
@@ -84,9 +89,8 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error creating bulk questions:", error);
     return NextResponse.json(
-      { error: error.message || "Error creating bulk questions" },
+      { error: error || "Error creating bulk questions" },
       { status: 500 }
     );
   }
