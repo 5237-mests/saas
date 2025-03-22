@@ -36,7 +36,6 @@ export default function MockTestHome() {
     fetch("/api/categories")
       .then((response) => response.json())
       .then((data) => {
-        console.log("first", data);
         setCategories([{ id: "default", name: "All Categories" }, ...data]);
       })
       .catch((error) => {
@@ -53,7 +52,6 @@ export default function MockTestHome() {
   const handleViewResults = () => {
     router.push("/mock-test/results");
   };
-  console.log("first2", categories);
   return (
     <div className="max-w-3xl mx-auto">
       <Card className="shadow-lg">

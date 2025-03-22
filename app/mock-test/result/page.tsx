@@ -95,7 +95,7 @@ export default function ResultPage() {
       <Card className="shadow-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl">Test Results</CardTitle>
-          <CardDescription>{selectedCategory} Test</CardDescription>
+          <CardDescription>{selectedCategory["name"]} Test</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
           <div className="text-center">
