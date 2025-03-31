@@ -146,3 +146,5 @@ Define the **navigation and flow of the mock exam pages** step by step. Since th
 /mock-test/submit → Click Submit Test → /mock-test/result
 /mock-test/result → View Score → Retake or Exit
 ```
+
+    // "dev": "concurrently \"next dev --turbopack\" \"cross-env NODE_ENV=development electron .\""
